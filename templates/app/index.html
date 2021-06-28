@@ -1,0 +1,18 @@
+<head>
+    <h2>Meals - reggex patterns</h2>
+</head>
+<body>
+    <form method='POST'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type='submit' value='Show results' name='show_results'>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-dismissible alert-success">
+            <strong>{{message}}<strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    </form>
+    {{ results|safe }}
+</body>
