@@ -1,7 +1,8 @@
 from django.shortcuts import render, HttpResponse
+from django.contrib import messages
 
 from .forms import ResultsForm
-from .handle_parquet_and_regex import regex_results
+from .handle_parquet_and_regex import regex_results, read_parquet
 
 
 def list_regex_results(request):
@@ -11,7 +12,17 @@ def list_regex_results(request):
         form = ResultsForm(request.POST)
         if not form.is_valid():
             return render(request, 'app/index.html', {'form': form})
-        return regex_results(request, form)
+        
+        parquet_file = './UK_outlet_meal.parquet.gzip'
+        file_is_valid, data = read_parquet(parquet_file)
+        if not file_is_valid:
+            messages.info(request, data)
+            return render(request, 'app/index.html', {'form': form})
+        results, errors = regex_results(form, data)
+        if errors:
+            messages.info(request, errors)
+            return render(request, 'app/index.html', {'form': form})
+        return render(request, 'app/index.html', {'results': results.to_html(), 'form': form})
 
     elif request.method == 'GET':
         form = ResultsForm()
