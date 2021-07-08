@@ -9,7 +9,6 @@ class RuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rule
         fields = '__all__'
-        extra_kwargs = {'brands': {'required': True}}
 
     def validate_pattern(self, value):
         """Validates that the given pattern is a valid regex."""
