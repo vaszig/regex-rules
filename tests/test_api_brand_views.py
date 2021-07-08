@@ -1,5 +1,3 @@
-import json
-
 from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
@@ -28,12 +26,12 @@ class TestBrandsListView(TestCase):
 
     def test_post_method_adds_new_brand(self):
         brand = {"name": "New brand"}
-        response = self.client.post(reverse('create-list-brands'), data=json.dumps(brand), content_type='application/json')
+        response = self.client.post(reverse('create-list-brands'), data=brand, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_method_fails_to_add_new_brand(self):
         brand = {"nme": "New brand"}
-        response = self.client.post(reverse('create-list-brands'), data=json.dumps(brand), content_type='application/json')
+        response = self.client.post(reverse('create-list-brands'), data=brand, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -46,7 +44,7 @@ class TestBrandDetailView(TestCase):
         
     def test_get_valid_single_brand(self):
         response = self.client.get(reverse('detail-update-delete-brand', kwargs={'id': self.brand1.id}))
-        brand1 = Brand.objects.get(id=1)
+        brand1 = Brand.objects.get(id=self.brand1.id)
         serializer = BrandSerializer(brand1)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -57,16 +55,17 @@ class TestBrandDetailView(TestCase):
 
     def test_valid_update_brand(self):
         response = self.client.put(
-            reverse('detail-update-delete-brand', kwargs={'id': self.brand1.id}),
-            data=json.dumps({"name": "Updated brand1"}),
-            content_type='application/json'
+            reverse('detail-update-delete-brand', 
+            kwargs={'id': self.brand1.id}), 
+            data={"name": "Updated brand1"}, content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_invalid_update_brand(self):
         response = self.client.put(
-            reverse('detail-update-delete-brand', kwargs={'id': self.brand2.id}),
-            data=json.dumps({"name": "Test Brand 1"}),
+            reverse('detail-update-delete-brand', 
+            kwargs={'id': self.brand2.id}),
+            data={"name": "Test Brand 1"},
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
